@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}PAD Symptoms · Health History{% endblock %}
+{% block content %}
+<section class="panel">
+  <h2>Log a PAD symptom / exam</h2>
+  <form class="entry-form" method="post" action="/pad/">
+    <label>Date<input type="date" name="symptom_date" required></label>
+    <label>Type
+      <select name="symptom_type" required>
+        {% for t in symptom_types %}<option value="{{ t }}">{{ t.replace('_',' ') }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Leg
+      <select name="leg">
+        <option value="">n/a</option>
+        <option value="left">left</option>
+        <option value="right">right</option>
+        <option value="both">both</option>
+      </select>
+    </label>
+    <label>Severity
+      <select name="severity">
+        <option value="">—</option>
+        <option value="mild">mild</option>
+        <option value="moderate">moderate</option>
+        <option value="severe">severe</option>
+      </select>
+    </label>
+    <label>Notes<textarea name="notes" placeholder="e.g. pain after walking ~2 blocks"></textarea></label>
+    <button type="submit">Add</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>History</h2>
+  {% if entries %}
+  <table>
+    <thead><tr><th>Date</th><th>Type</th><th>Leg</th><th>Severity</th><th>Notes</th><th></th></tr></thead>
+    <tbody>
+      {% for e in entries %}
+      <tr>
+        <td>{{ e.symptom_date.strftime('%b %d, %Y') }}</td>
+        <td>{{ e.symptom_type.replace('_',' ') }}</td>
+        <td>{{ e.leg or "—" }}</td>
+        <td>{% if e.severity %}<span class="badge {{ e.severity }}">{{ e.severity }}</span>{% else %}—{% endif %}</td>
+        <td>{{ e.notes or "—" }}</td>
+        <td>
+          <form class="inline" method="post" action="/pad/{{ e.id }}/delete" onsubmit="return confirm('Delete this entry?')">
+            <button class="danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="empty">No entries yet.</p>{% endif %}
+</section>
+{% endblock %}

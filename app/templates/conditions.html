@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Conditions · Health History{% endblock %}
+{% block content %}
+<section class="panel">
+  <h2>Add a condition</h2>
+  <form class="entry-form" method="post" action="/conditions/">
+    <label>Name<input name="name" required></label>
+    <label>Category<input name="category" placeholder="e.g. Endocrine"></label>
+    <label>Diagnosed<input type="date" name="diagnosed_date"></label>
+    <label>Status
+      <select name="status">
+        <option value="active">active</option>
+        <option value="resolved">resolved</option>
+      </select>
+    </label>
+    <label>Notes<textarea name="notes"></textarea></label>
+    <button type="submit">Add</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>All conditions</h2>
+  {% if conditions %}
+  <table>
+    <thead><tr><th>Name</th><th>Category</th><th>Diagnosed</th><th>Status</th><th>Notes</th><th></th></tr></thead>
+    <tbody>
+      {% for c in conditions %}
+      <tr>
+        <td>{{ c.name }}</td>
+        <td>{{ c.category or "—" }}</td>
+        <td>{{ c.diagnosed_date.strftime('%b %d, %Y') if c.diagnosed_date else "—" }}</td>
+        <td>
+          <form class="inline" method="post" action="/conditions/{{ c.id }}/status">
+            <select name="status" onchange="this.form.submit()">
+              <option value="active" {% if c.status == "active" %}selected{% endif %}>active</option>
+              <option value="resolved" {% if c.status == "resolved" %}selected{% endif %}>resolved</option>
+            </select>
+          </form>
+        </td>
+        <td>{{ c.notes or "—" }}</td>
+        <td>
+          <form class="inline" method="post" action="/conditions/{{ c.id }}/delete" onsubmit="return confirm('Delete this condition?')">
+            <button class="danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="empty">No conditions recorded yet.</p>{% endif %}
+</section>
+{% endblock %}

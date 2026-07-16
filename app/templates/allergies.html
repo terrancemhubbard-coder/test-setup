@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Allergies · Health History{% endblock %}
+{% block content %}
+<section class="panel">
+  <h2>Add an allergy</h2>
+  <form class="entry-form" method="post" action="/allergies/">
+    <label>Allergen<input name="allergen" required></label>
+    <label>Reaction<input name="reaction" placeholder="e.g. hives"></label>
+    <label>Severity
+      <select name="severity">
+        <option value="">—</option>
+        <option value="mild">mild</option>
+        <option value="moderate">moderate</option>
+        <option value="severe">severe</option>
+      </select>
+    </label>
+    <label>Notes<textarea name="notes"></textarea></label>
+    <button type="submit">Add</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>All allergies</h2>
+  {% if allergies %}
+  <table>
+    <thead><tr><th>Allergen</th><th>Reaction</th><th>Severity</th><th>Notes</th><th></th></tr></thead>
+    <tbody>
+      {% for a in allergies %}
+      <tr>
+        <td>{{ a.allergen }}</td>
+        <td>{{ a.reaction or "—" }}</td>
+        <td>{% if a.severity %}<span class="badge {{ a.severity }}">{{ a.severity }}</span>{% else %}—{% endif %}</td>
+        <td>{{ a.notes or "—" }}</td>
+        <td>
+          <form class="inline" method="post" action="/allergies/{{ a.id }}/delete" onsubmit="return confirm('Delete this allergy?')">
+            <button class="danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="empty">No allergies recorded yet.</p>{% endif %}
+</section>
+{% endblock %}
